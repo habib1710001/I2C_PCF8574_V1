@@ -1,4 +1,4 @@
-Src/main.o: ../Src/main.c \
+Src/i2c.o: ../Src/i2c.c \
  E:/Embedded_System/Microcontrolling_Unit/Bare-Metal_Programming_ARM_Cortex-M/Chip_headers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h \
  E:/Embedded_System/Microcontrolling_Unit/Bare-Metal_Programming_ARM_Cortex-M/Chip_headers/CMSIS/Device/ST/STM32F4xx/Include/stm32f446xx.h \
  E:/Embedded_System/Microcontrolling_Unit/Bare-Metal_Programming_ARM_Cortex-M/Chip_headers/CMSIS/Include/core_cm4.h \

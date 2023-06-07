@@ -1,3 +1,4 @@
+"./Src/i2c.o"
 "./Src/main.o"
 "./Src/syscalls.o"
 "./Src/sysmem.o"
