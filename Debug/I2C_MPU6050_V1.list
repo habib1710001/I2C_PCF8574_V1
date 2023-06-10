@@ -474,7 +474,7 @@ int main(void)
  8000458:	203f      	movs	r0, #63	; 0x3f
  800045a:	f7ff ffa7 	bl	80003ac <I2C_Address>
 		//Write the data
-		I2C_Write(0x02);
+		I2C_Write(2);
  800045e:	2002      	movs	r0, #2
  8000460:	f7ff ffc4 	bl	80003ec <I2C_Write>
 		//Generate stop bit
