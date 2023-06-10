@@ -19,8 +19,7 @@
 #define SR1_RXNE  (1  << 6)
 #define SR1_BTF   (1  << 2)
 #define CR1_STOP  (1U << 9)
-
-
+volatile uint8_t flag; //Variable for debugging
 
 /***********Steps I2C Configurations**************
  * Enable the I2C and GPIO Clock
@@ -108,6 +107,7 @@ void I2C_init(void){
 
 	//Enable the peripheral
 	I2C1 -> CR1 |= CR1_PE;
+	flag = 0;
 }
 
 void I2C_Start(void){
@@ -119,7 +119,9 @@ void I2C_Start(void){
 	I2C1 -> CR1 |= CR1_START;
 
 	//wait until the start condition is generated
-	while(!((I2C1 -> SR1) & (SR1_SB)));
+	while(!((I2C1 -> SR1) & (SR1_SB))){
+        flag = 1;
+	}
 }
 
 void I2C_Address(uint8_t address){
@@ -128,7 +130,9 @@ void I2C_Address(uint8_t address){
 	I2C1 -> DR = address;
 
 	//wait until the address transmission is done
-	while (!((I2C1 -> SR1) & (SR1_ADDR)));
+	while (!((I2C1 -> SR1) & (SR1_ADDR))){
+        flag = 2;
+	}
 
 	//Read SR1 and SR2 to clear the ADDR Bit
 	uint8_t temp = (I2C1 -> SR1 | I2C1 -> SR2);
@@ -138,23 +142,31 @@ void I2C_Address(uint8_t address){
 void I2C_Write(uint8_t data){
 
 	//wait until the last address transmission is done
-    while (!((I2C1 -> SR1) & (SR1_TxE)));
+    while (!((I2C1 -> SR1) & (SR1_TxE))){
+        flag = 3;
+    }
 
     //Transmit address + read
 	I2C1 -> DR = data;
 
 	//Wait until the data byte transfer is completed
-    while (!((I2C1 -> SR1) & (SR1_BTF)));
+    while (!((I2C1 -> SR1) & (SR1_BTF))){
+        flag = 4;
+    }
 
 }
 
 void I2C_WriteMulti(uint8_t *data, uint8_t size){
 
 	//wait until the last address transmission is done
-    while (!((I2C1 -> SR1) & (SR1_TxE))){}
+    while (!((I2C1 -> SR1) & (SR1_TxE))){
+        flag = 5;
+    }
 
     while (size){
-      while (!((I2C1 -> SR1) & (SR1_TxE)));
+      while (!((I2C1 -> SR1) & (SR1_TxE))){
+          flag = 6;
+      }
       //Transmit data
   	  I2C1 -> DR = (volatile uint32_t) *data++;
   	  size--;
