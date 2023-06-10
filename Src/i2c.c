@@ -119,7 +119,7 @@ void I2C_Start(void){
 	I2C1 -> CR1 |= CR1_START;
 
 	//wait until the start condition is generated
-	while(!((I2C1 -> SR1) & (SR1_SB))){}
+	while(!((I2C1 -> SR1) & (SR1_SB)));
 }
 
 void I2C_Address(uint8_t address){
@@ -131,7 +131,7 @@ void I2C_Address(uint8_t address){
 	while (!((I2C1 -> SR1) & (SR1_ADDR)));
 
 	//Read SR1 and SR2 to clear the ADDR Bit
-	uint16_t temp = ((I2C1 -> SR1) | (I2C1 -> SR2));
+	uint8_t temp = (I2C1 -> SR1 | I2C1 -> SR2);
 }
 
 

@@ -635,10 +635,10 @@ LOAD c:/st/stm32cubeide_1.12.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.ext
 LOAD c:/st/stm32cubeide_1.12.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.200.202301161003/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libm.a
 LOAD c:/st/stm32cubeide_1.12.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.200.202301161003/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/thumb/v7e-m+fp/hard\libgcc.a
 
-.debug_info     0x0000000000000000      0x5d6
- .debug_info    0x0000000000000000      0x4da ./Src/i2c.o
- .debug_info    0x00000000000004da       0xda ./Src/main.o
- .debug_info    0x00000000000005b4       0x22 ./Startup/startup_stm32f446retx.o
+.debug_info     0x0000000000000000      0x5be
+ .debug_info    0x0000000000000000      0x4c2 ./Src/i2c.o
+ .debug_info    0x00000000000004c2       0xda ./Src/main.o
+ .debug_info    0x000000000000059c       0x22 ./Startup/startup_stm32f446retx.o
 
 .debug_abbrev   0x0000000000000000      0x18f
  .debug_abbrev  0x0000000000000000       0xf6 ./Src/i2c.o
@@ -678,17 +678,17 @@ LOAD c:/st/stm32cubeide_1.12.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.ext
  .debug_macro   0x0000000000018a11       0x6d ./Src/i2c.o
  .debug_macro   0x0000000000018a7e       0xd8 ./Src/main.o
 
-.debug_line     0x0000000000000000      0xc02
+.debug_line     0x0000000000000000      0xc04
  .debug_line    0x0000000000000000      0x66a ./Src/i2c.o
- .debug_line    0x000000000000066a      0x514 ./Src/main.o
- .debug_line    0x0000000000000b7e       0x84 ./Startup/startup_stm32f446retx.o
+ .debug_line    0x000000000000066a      0x516 ./Src/main.o
+ .debug_line    0x0000000000000b80       0x84 ./Startup/startup_stm32f446retx.o
 
-.debug_str      0x0000000000000000    0x8aefe
- .debug_str     0x0000000000000000    0x8aeba ./Src/i2c.o
-                                      0x8b048 (size before relaxing)
- .debug_str     0x000000000008aeba       0x13 ./Src/main.o
+.debug_str      0x0000000000000000    0x8aef3
+ .debug_str     0x0000000000000000    0x8aeaf ./Src/i2c.o
+                                      0x8b034 (size before relaxing)
+ .debug_str     0x000000000008aeaf       0x13 ./Src/main.o
                                       0x8ad50 (size before relaxing)
- .debug_str     0x000000000008aecd       0x31 ./Startup/startup_stm32f446retx.o
+ .debug_str     0x000000000008aec2       0x31 ./Startup/startup_stm32f446retx.o
                                          0x93 (size before relaxing)
 
 .comment        0x0000000000000000       0x50
