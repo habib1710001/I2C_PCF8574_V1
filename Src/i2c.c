@@ -48,12 +48,12 @@ void I2C_init(void){
 
 	//Enables the Alternate function for the GPIO
 	//MODER8
+	GPIOB -> MODER &=~(1U << 16);
 	GPIOB -> MODER |=  (1U << 17);
-	GPIOB -> MODER &= ~(1U << 16);
 
 	//MODER9
+	GPIOB -> MODER &=~(1U << 18);
 	GPIOB -> MODER |=  (1U << 19);
-	GPIOB -> MODER &= ~(1U << 18);
 
 	//Configuring the output type  -> Open Drain
 	GPIOB -> OTYPER |= OTYPER_OT8;
@@ -74,12 +74,20 @@ void I2C_init(void){
 	GPIOB-> PUPDR &= ~(1U << 17);
 	//PUPDR9
 	GPIOB-> PUPDR |=  (1U << 18);
-	GPIOB-> PUPDR &= ~(1U << 19);
+	GPIOB-> PUPDR &=~(1U << 19);
 
 	//Configure the Alternate Function in the AFR Register
 	//the pins were set in the alternate functions mode,
 	//but that was not defined what those functions should be.
-	GPIOB-> AFR[1] |= ((4 << 0) | (4 << 4));
+	GPIOB-> AFR[1] &=~(1U << 0);
+	GPIOB-> AFR[1] &=~(1U << 1);
+	GPIOB-> AFR[1] |= (1U << 2);
+	GPIOB-> AFR[1] &=~(1U << 3);
+
+	GPIOB-> AFR[1] &=~(1U << 4);
+	GPIOB-> AFR[1] &=~(1U << 5);
+	GPIOB-> AFR[1] |= (1U << 6);
+	GPIOB-> AFR[1] &=~(1U << 7);
 
 	// Enable clock for the I2C
 	RCC -> APB1ENR |= I2C1EN;
