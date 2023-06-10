@@ -362,7 +362,7 @@ void I2C_Address(uint8_t address){
  80003c4:	71fb      	strb	r3, [r7, #7]
 
 	//Transmit address
-	I2C1 -> DR = address;
+	I2C1->DR = address;
  80003c6:	4a0d      	ldr	r2, [pc, #52]	; (80003fc <I2C_Address+0x40>)
  80003c8:	79fb      	ldrb	r3, [r7, #7]
  80003ca:	6113      	str	r3, [r2, #16]

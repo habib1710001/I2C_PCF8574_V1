@@ -127,7 +127,7 @@ void I2C_Start(void){
 void I2C_Address(uint8_t address){
 
 	//Transmit address
-	I2C1 -> DR = address;
+	I2C1->DR = address;
 
 	//wait until the address transmission is done
 	while (!((I2C1 -> SR1) & (SR1_ADDR))){
