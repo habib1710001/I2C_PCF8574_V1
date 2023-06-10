@@ -1,26 +1,23 @@
-#include "stm32f4xx.h"
 #include "i2c.h"
 
 #define GPIOBEN (1U << 1)
 #define I2C1EN  (1U << 21)
-#define OTYPER_OT8 (1U << 8)
-#define OTYPER_OT9 (1U << 9)
-#define SWRST   (1U << 15)
+#define OTYPER_OT8 (1 << 8)
+#define OTYPER_OT9 (1 << 9)
+#define SWRST   (1 << 15)
 #define FREQ    (1U << 4)
-#define F_S     (1U << 15)
-#define CR1_PE  (1U << 0)
+#define CR1_PE  (1 << 0)
 #define SD_MODE_MAX_RISE_TIME (17 << 0)
 
 #define SR2_BUSY  (1U << 1)
-#define CR1_START (1U << 8)
-#define CR1_ACK   (1U << 10)
-#define SR1_SB    (1U << 0)
-#define SR1_ADDR  (1U << 1)
-#define SR1_TxE   (1U << 7)
-#define CR1_ACK   (1U << 10)
+#define CR1_START (1 << 8)
+#define CR1_ACK   (1 << 10)
+#define SR1_SB    (1  << 0)
+#define SR1_ADDR  (1  << 1)
+#define SR1_TxE   (1  << 7)
 #define CR1_STOP  (1U << 9)
-#define SR1_RXNE  (1U << 6)
-#define SR1_BTF   (1U << 2)
+#define SR1_RXNE  (1  << 6)
+#define SR1_BTF   (1  << 2)
 #define CR1_STOP  (1U << 9)
 
 
@@ -42,6 +39,8 @@
 
 
 void I2C_init(void){
+	// Enable clock for the I2C
+	RCC -> APB1ENR |= I2C1EN;
 
 	//Enable the GPIOB Clock
 	RCC -> AHB1ENR |= GPIOBEN;
@@ -71,7 +70,7 @@ void I2C_init(void){
 
 	//PUPDR8
 	GPIOB-> PUPDR |=  (1U << 16);
-	GPIOB-> PUPDR &= ~(1U << 17);
+	GPIOB-> PUPDR &=~(1U << 17);
 	//PUPDR9
 	GPIOB-> PUPDR |=  (1U << 18);
 	GPIOB-> PUPDR &=~(1U << 19);
@@ -89,16 +88,14 @@ void I2C_init(void){
 	GPIOB-> AFR[1] |= (1U << 6);
 	GPIOB-> AFR[1] &=~(1U << 7);
 
-	// Enable clock for the I2C
-	RCC -> APB1ENR |= I2C1EN;
 
 	//Reset the I2C -> Make sure I2C lines are released
 	I2C1 -> CR1 |= SWRST;
-	I2C1 -> CR1 &= ~SWRST;
+	I2C1 -> CR1 &=~SWRST;
 
 
 	//Program the peripheral input clock in I2C_CR2 Register in order to generate correct timing
-	I2C1 -> CR2 |= FREQ;   //PCLK1 frequency in MHz
+	I2C1 -> CR2 |= (16<<0);   //PCLK1 frequency in MHz
 
 
 	//T_high  = CCR * TPCLK1 ; T_high  = t_r(SCL) + t_w(SCLH)
@@ -114,8 +111,6 @@ void I2C_init(void){
 }
 
 void I2C_Start(void){
-	//wait until the bus is not busy
-	while((I2C1 -> SR2) & (SR2_BUSY)){}
 
 	//Acknowledge Enabled
 	I2C1 -> CR1 |= CR1_ACK;
@@ -133,23 +128,23 @@ void I2C_Address(uint8_t address){
 	I2C1 -> DR = address;
 
 	//wait until the address transmission is done
-	while (!((I2C1 -> SR1) & (SR1_ADDR))){}
+	while (!((I2C1 -> SR1) & (SR1_ADDR)));
 
 	//Read SR1 and SR2 to clear the ADDR Bit
-	volatile uint16_t temp = ((I2C1 -> SR1) | (I2C1 -> SR2));
+	uint16_t temp = ((I2C1 -> SR1) | (I2C1 -> SR2));
 }
 
 
 void I2C_Write(uint8_t data){
 
 	//wait until the last address transmission is done
-    while (!((I2C1 -> SR1) & (SR1_TxE))){}
+    while (!((I2C1 -> SR1) & (SR1_TxE)));
 
     //Transmit address + read
 	I2C1 -> DR = data;
 
 	//Wait until the data byte transfer is completed
-    while (!((I2C1 -> SR1) & (SR1_BTF))){}
+    while (!((I2C1 -> SR1) & (SR1_BTF)));
 
 }
 
