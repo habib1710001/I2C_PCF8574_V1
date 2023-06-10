@@ -1,2 +1,6 @@
-i2c.c:38:6:I2C1_init	1
-i2c.c:94:6:I2C1_byteRead	8
+i2c.c:40:6:I2C1_init	1
+i2c.c:96:6:I2C1_Start	3
+i2c.c:107:6:I2C_Address	2
+i2c.c:120:6:I2C_Write	3
+i2c.c:133:6:I2C_WriteMulti	5
+i2c.c:151:6:I2C_Stop	1
