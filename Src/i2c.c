@@ -1,15 +1,19 @@
 #include "stm32f4xx.h"
 #include "i2c.h"
 
-#define I2C2EN  (1U << 21)
+#define GPIOBEN (1U << 1)
+#define I2C1EN  (1U << 21)
+#define OTYPER_OT8 (1U << 8)
+#define OTYPER_OT9 (1U << 9)
 #define SWRST   (1U << 15)
 #define FREQ    (1U << 4)
 #define F_S     (1U << 15)
-#define PE      (1U << 0)
+#define CR1_PE  (1U << 0)
 #define SD_MODE_MAX_RISE_TIME (17 << 0)
 
 #define SR2_BUSY  (1U << 1)
 #define CR1_START (1U << 8)
+#define CR1_ACK   (1U << 10)
 #define SR1_SB    (1U << 0)
 #define SR1_ADDR  (1U << 1)
 #define SR1_TxE   (1U << 7)
@@ -37,38 +41,48 @@
  * */
 
 
-void I2C1_init(void){
+void I2C_init(void){
 
 	//Enable the GPIOB Clock
-	RCC -> AHB1ENR |= (1U << 1);
+	RCC -> AHB1ENR |= GPIOBEN;
 
 	//Enables the Alternate function for the GPIO
-	GPIOB -> MODER |= (1U << 17);
+	//MODER8
+	GPIOB -> MODER |=  (1U << 17);
 	GPIOB -> MODER &= ~(1U << 16);
 
-	GPIOB -> MODER |= (1U << 19);
+	//MODER9
+	GPIOB -> MODER |=  (1U << 19);
 	GPIOB -> MODER &= ~(1U << 18);
 
 	//Configuring the output type  -> Open Drain
-	GPIOB -> OTYPER |= (1U << 8);
-	GPIOB -> OTYPER |= (1U << 9);
+	GPIOB -> OTYPER |= OTYPER_OT8;
+	GPIOB -> OTYPER |= OTYPER_OT9;
 
 	//Configuring the high-speed   -> High Speed
+	//OSPEEDR8
 	GPIOB-> OSPEEDR |= ((1U << 17) | (1U << 16));
+	//OSPEEDR9
 	GPIOB-> OSPEEDR |= ((1U << 19) | (1U << 18));
 
 	//Selecting  the pull-up in the GPIO
-	GPIOB-> PUPDR |= (1U << 16);
-	GPIOB-> PUPDR &= ~(1U << 17);
+	//It’s better to use external pull up registers while using I2C,
+	//but just for Simplicity internal pull-up resistors is used
 
-	GPIOB-> PUPDR |= (1U << 18);
+	//PUPDR8
+	GPIOB-> PUPDR |=  (1U << 16);
+	GPIOB-> PUPDR &= ~(1U << 17);
+	//PUPDR9
+	GPIOB-> PUPDR |=  (1U << 18);
 	GPIOB-> PUPDR &= ~(1U << 19);
 
 	//Configure the Alternate Function in the AFR Register
+	//the pins were set in the alternate functions mode,
+	//but that was not defined what those functions should be.
 	GPIOB-> AFR[1] |= ((4 << 0) | (4 << 4));
 
 	// Enable clock for the I2C
-	RCC -> APB1ENR |= I2C2EN;
+	RCC -> APB1ENR |= I2C1EN;
 
 	//Reset the I2C -> Make sure I2C lines are released
 	I2C1 -> CR1 |= SWRST;
@@ -78,24 +92,25 @@ void I2C1_init(void){
 	//Program the peripheral input clock in I2C_CR2 Register in order to generate correct timing
 	I2C1 -> CR2 |= FREQ;   //PCLK1 frequency in MHz
 
-	//Configuring the clock control register
-	I2C1  -> CCR &= ~F_S;     //I2C Standard mode
 
 	//T_high  = CCR * TPCLK1 ; T_high  = t_r(SCL) + t_w(SCLH)
 	//CCR = (t_r(SCL) + t_w(SCLH))/TPCLK1 = (1000ns + 4000ns)/(62.5ns) = 80
-	I2C1  -> CCR |= ( 80<<0 );  //CCR Value
+	I2C1  -> CCR |= (80<<0);  //CCR Value
 
 	// Configure the rise time register
 	// TRISE = (T_r(SCL)/T(PCLK1))+1 = (1000 / 62.5) + 1 = 17
 	I2C1 -> TRISE |= SD_MODE_MAX_RISE_TIME;
 
 	//Enable the peripheral
-	I2C1 -> CR2 |= PE;
+	I2C1 -> CR1 |= CR1_PE;
 }
 
-void I2C1_Start(){
+void I2C_Start(void){
 	//wait until the bus is not busy
 	while((I2C1 -> SR2) & (SR2_BUSY)){}
+
+	//Acknowledge Enabled
+	I2C1 -> CR1 |= CR1_ACK;
 
 	//Generate the Start condition
 	I2C1 -> CR1 |= CR1_START;
@@ -107,13 +122,13 @@ void I2C1_Start(){
 void I2C_Address(uint8_t address){
 
 	//Transmit address
-	I2C1 -> DR = address ;
+	I2C1 -> DR = address;
 
 	//wait until the address transmission is done
 	while (!((I2C1 -> SR1) & (SR1_ADDR))){}
 
 	//Read SR1 and SR2 to clear the ADDR Bit
-	uint16_t tmp = (I2C1 -> SR1 | I2C1 -> SR2);
+	volatile uint16_t temp = ((I2C1 -> SR1) | (I2C1 -> SR2));
 }
 
 

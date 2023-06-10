@@ -1,6 +1,6 @@
-../Src/i2c.c:40:6:I2C1_init	4	static
-../Src/i2c.c:96:6:I2C1_Start	4	static
-../Src/i2c.c:107:6:I2C_Address	24	static
-../Src/i2c.c:120:6:I2C_Write	16	static
-../Src/i2c.c:133:6:I2C_WriteMulti	16	static
-../Src/i2c.c:151:6:I2C_Stop	4	static
+../Src/i2c.c:44:6:I2C_init	4	static
+../Src/i2c.c:108:6:I2C_Start	4	static
+../Src/i2c.c:122:6:I2C_Address	24	static
+../Src/i2c.c:135:6:I2C_Write	16	static
+../Src/i2c.c:148:6:I2C_WriteMulti	16	static
+../Src/i2c.c:166:6:I2C_Stop	4	static
