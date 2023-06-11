@@ -7,11 +7,11 @@
 #define SWRST   (1 << 15)
 #define FREQ    (1U << 4)
 #define CR1_PE  (1 << 0)
-#define SD_MODE_MAX_RISE_TIME (17 << 0)
+#define SD_MODE_MAX_RISE_TIME (17<<0)
 
 #define SR2_BUSY  (1U << 1)
-#define CR1_START (1 << 8)
-#define CR1_ACK   (1 << 10)
+#define CR1_START (1  << 8)
+#define CR1_ACK   (1  << 10)
 #define SR1_SB    (1  << 0)
 #define SR1_ADDR  (1  << 1)
 #define SR1_TxE   (1  << 7)
@@ -38,16 +38,14 @@ volatile uint8_t flag; //Variable for debugging
 
 
 void I2C_init(void){
-	// Enable clock for the I2C
-	RCC -> APB1ENR |= I2C1EN;
 
 	//Enable the GPIOB Clock
-	RCC -> AHB1ENR |= GPIOBEN;
+	RCC->AHB1ENR |= GPIOBEN;
 
 	//Enables the Alternate function for the GPIO
 	//MODER8
-	GPIOB -> MODER &=~(1U << 16);
-	GPIOB -> MODER |=  (1U << 17);
+	GPIOB->MODER  &=~(1U << 16);
+	GPIOB-> MODER |=  (1U << 17);
 
 	//MODER9
 	GPIOB -> MODER &=~(1U << 18);
@@ -87,6 +85,8 @@ void I2C_init(void){
 	GPIOB-> AFR[1] |= (1U << 6);
 	GPIOB-> AFR[1] &=~(1U << 7);
 
+	// Enable clock for the I2C
+	RCC -> APB1ENR |= I2C1EN;
 
 	//Reset the I2C -> Make sure I2C lines are released
 	I2C1 -> CR1 |= SWRST;
@@ -99,11 +99,11 @@ void I2C_init(void){
 
 	//T_high  = CCR * TPCLK1 ; T_high  = t_r(SCL) + t_w(SCLH)
 	//CCR = (t_r(SCL) + t_w(SCLH))/TPCLK1 = (1000ns + 4000ns)/(62.5ns) = 80
-	I2C1  -> CCR |= (80<<0);  //CCR Value
+	I2C1  -> CCR = (80<<0);  //CCR Value
 
 	// Configure the rise time register
 	// TRISE = (T_r(SCL)/T(PCLK1))+1 = (1000 / 62.5) + 1 = 17
-	I2C1 -> TRISE |= SD_MODE_MAX_RISE_TIME;
+	I2C1 -> TRISE = SD_MODE_MAX_RISE_TIME;
 
 	//Enable the peripheral
 	I2C1 -> CR1 |= CR1_PE;
@@ -113,29 +113,32 @@ void I2C_init(void){
 void I2C_Start(void){
 
 	//Acknowledge Enabled
-	I2C1 -> CR1 |= CR1_ACK;
+	I2C1-> CR1 |= CR1_ACK;
 
 	//Generate the Start condition
 	I2C1 -> CR1 |= CR1_START;
 
 	//wait until the start condition is generated
-	while(!((I2C1 -> SR1) & (SR1_SB))){
+	while(!((I2C1->SR1) & (SR1_SB))){
         flag = 1;
 	}
 }
 
 void I2C_Address(uint8_t address){
 
-	//Transmit address
-	I2C1->DR = address;
+	//Transmit address + Write
+	//The 7-bit device address is left-aligned in the 8-bit data register (DR) of the I2C peripheral
+	//The least significant bit (LSB) of the 8-bit DR is reserved for indicating whether the operation is a read or write.
+	//LSB -> 0 is Write mode
+	I2C1->DR = address << 1;
 
 	//wait until the address transmission is done
-	while (!((I2C1 -> SR1) & (SR1_ADDR))){
+	while (!((I2C1->SR1)&(SR1_ADDR))){
         flag = 2;
 	}
 
 	//Read SR1 and SR2 to clear the ADDR Bit
-	uint8_t temp = (I2C1 -> SR1 | I2C1 -> SR2);
+	uint8_t temp = I2C1->SR1 | I2C1->SR2;
 }
 
 
@@ -147,7 +150,7 @@ void I2C_Write(uint8_t data){
     }
 
     //Transmit address + read
-	I2C1 -> DR = data;
+	I2C1-> DR = data;
 
 	//Wait until the data byte transfer is completed
     while (!((I2C1 -> SR1) & (SR1_BTF))){
